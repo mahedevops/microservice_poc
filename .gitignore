@@ -1,0 +1,11 @@
+**/.gitignore
+**/.classpath
+**/.project
+**/target
+**/log
+**/*.log*
+**/*.jar
+**/*.bat
+**/*.sh
+**/.settings
+!/.gitignore

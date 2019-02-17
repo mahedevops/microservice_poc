@@ -1,0 +1,72 @@
+---
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: demo-volume
+  namespace: demo
+  labels:
+    type: local
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 2Gi
+  accessModes:
+    - ReadWriteOnce
+  hostPath:
+    path: "/home/ubuntu/data"
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: demo-pv-claim
+  namespace: demo
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-api-1-0
+  namespace: demo
+  labels:
+    app: user-api-1-0
+spec:
+  ports:
+  - port: 8089
+    targetPort: 8089
+    protocol: TCP
+    name: http
+  selector:
+    app: user-api-1-0
+---
+apiVersion: apps/v1beta1
+kind: Deployment
+metadata:
+  name: user-api-1-0-deployment
+  namespace: demo
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: user-api-1-0
+    spec:
+      containers:
+      - name: user-api-1-0-container
+        image: sumitdatta2015/user-api:latest
+        command: ["java"]
+        args: ["-jar", "user-api.jar"]
+        env:
+        - name: PATH
+          value: "/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/docker-java-home/bin"
+        - name: JAVA_HOME
+          value: "/docker-java-home"
+        - name: JAVA_VERSION
+          value: "8u181"
+        ports:
+        - containerPort: 8089
